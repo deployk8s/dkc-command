@@ -26,7 +26,7 @@ dkc项目旨帮助kubernetes小白在centos 7.9.2009上快速安装kubernetes v1
 ```shell script
 ./dkc download cache
 ```
-3. 在web界面编辑拓扑文件,下载hosts.yaml,并放在inventory目录
+3. 开启web界面,访问localhost:5555编辑拓扑文件,下载hosts.yaml,并放在inventory目录
 ```shell script
 ./dkc web
 ```
