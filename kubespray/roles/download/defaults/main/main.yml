@@ -1359,24 +1359,6 @@ downloads:
     groups:
       - kube_node
 
-  elastalert2:
-    enabled: true
-    container: true
-    repo: "{{ elastalert2_image_repo }}"
-    tag: "{{ elastalert2_image_tag }}"
-    sha256: "{{ elastalert2_digest_checksum|default(None) }}" # 非None时，会执行docker pull
-    groups:
-      - kube_node
-
-  log_exporter:
-    enabled: true
-    container: true
-    repo: "{{ log_image_repo }}"
-    tag: "{{ log_image_tag }}"
-    sha256: "{{ log_digest_checksum|default(None) }}" # 非None时，会执行docker pull
-    groups:
-      - kube_node
-
   logstash:
     enabled: "{{ elk_enabled }}"
     container: true
@@ -1458,27 +1440,7 @@ downloads:
     mode: "0755"
     groups:
       - kube_control_plane
-  prometheus_webhook_dingtalk_chart:
-    enabled: "{{ prometheus_stack_enabled }}"
-    file: true
-    version: "{{ prometheus_webhook_dingtalk_version }}"
-    dest: "{{local_release_dir}}/charts/prometheus-webhook-dingtalk-{{ prometheus_webhook_dingtalk_version }}.tgz"
-    sha256: "{{ prometheus_webhook_dingtalk_checksum }}"
-    url: "{{ prometheus_webhook_dingtalk_download_url }}"
-    unarchive: true
-    owner: "root"
-    mode: "0644"
-    groups:
-      - kube_control_plane[0]
 
-  prometheus_webhook_dingtalk:
-    enabled: "{{ prometheus_stack_enabled }}"
-    container: true
-    repo: "{{ prometheus_webhook_dingtalk_image_repo }}"
-    tag: "{{ prometheus_webhook_dingtalk_image_tag }}"
-    sha256: "{{ prometheus_webhook_dingtalk_digest_checksum |default(None) }}"
-    groups:
-      - kube_node
   kustomize:
     enabled: true
     file: true

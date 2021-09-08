@@ -143,13 +143,6 @@ dependencies:
     tags:
       - prometheus_stack
 
-  - role: kubernetes-apps/prometheus-webhook-dingtalk
-    when:
-      - prometheus_stack_enabled
-      - inventory_hostname == groups['kube_control_plane'][0]
-    tags:
-      - prometheus_stack
-
   - role: kubernetes-apps/elk
     when:
       - elk_enabled

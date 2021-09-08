@@ -1,16 +1,15 @@
 package web
 
 import (
-	"github.com/deployKubernetesInCHINA/dkc-command/src/config"
-	"github.com/deployKubernetesInCHINA/dkc-command/src/download"
-
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
+
+	"github.com/deployKubernetesInCHINA/dkc-command/src/config"
 )
 
 func Web() {
 	config.InitWeb()
-	download.UpdateMirror()
+	//download.UpdateMirror()
 	beego.BConfig.Listen.HTTPPort = config.Kconfig.Port
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		//允许访问所有源
@@ -28,5 +27,6 @@ func Web() {
 	beego.SetStaticPath("/images","static/images")
 	beego.SetStaticPath("/css","static/css")
 	beego.SetStaticPath("/js","static/js")
+	beego.SetStaticPath("/fonts","static/fonts")
 	beego.Run()
 }

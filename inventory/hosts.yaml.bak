@@ -4,7 +4,6 @@ all:
     login_type: sshkey
     external_domain_name: www.test.com
     docker_daemon_graph: /var/lib/docker
-    mongodb_type: offline
   hosts:
     localhost:
       remote_machine_username: root
@@ -79,10 +78,6 @@ all:
       node_taints:
         - om.surpass=true:NoExecute
   children:
-    db:
-      children:
-        rs1: {}
-        rs2: {}
     k8s_cluster:
       vars:
         minio_enabled: true
@@ -118,10 +113,7 @@ all:
         kube_control_plane: {}
         kube_node: {}
     kube_control_plane:
-      vars:
-        ops_namespace: ops
-        ops_mongodb_ips: >-
-          mongodb://surpass:bizconf_surpass@192.168.57.8:30003,192.168.57.7:30003/surpass_ops?replicaSet=rs0
+      vars: {}
       hosts:
         surpass-master-1: {}
         surpass-master-2: {}
@@ -131,39 +123,12 @@ all:
         kube_control_plane: {}
     kube_node:
       children:
-        db: {}
-        sg: {}
         om: {}
       hosts:
         surpass-worker-1: {}
         surpass-worker-2: {}
         surpass-worker-3: {}
         surpass-worker-4: {}
-    rs1:
-      vars:
-        rs1_port: 30003
-        mongodb_data_dir: /mongodb
-        admin_user: admin
-        admin_password: surpass_admin
-        surpass_user: surpass
-        surpass_password: bizconf_surpass
-      hosts:
-        surpass-worker-2:
-          rs1_role: arbiter
-        surpass-worker-3:
-          rs1_role: secondary
-        surpass-worker-4:
-          rs1_role: primary
-    rs2: {}
-    sg1:
-      hosts:
-        surpass-worker-1: {}
-        surpass-worker-2: {}
-        surpass-worker-3: {}
-        surpass-worker-4: {}
-    sg:
-      children:
-        sg1: {}
     om:
       vars: {}
       hosts:
