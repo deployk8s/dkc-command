@@ -1,0 +1,71 @@
+- name: ELK | Clean
+  include_tasks: clean.yml
+
+- name: ELK | Download Chart
+  include_tasks: "{{ playbook_dir }}/roles/download/tasks/download_chart.yml"
+  vars:
+    download: "{{ download_defaults | combine(downloads.elk_chart) }}"
+
+- name: "ELK | set elasticsearch default values"
+  template:
+    variable_start_string: "<<"
+    variable_end_string: ">>"
+    src: "elasticsearch_values.yaml.j2"
+    dest: "{{local_release_dir}}/charts/elasticsearch/values.yaml"
+    backup: yes
+
+- name: ELK | Deploy elasticsearch master
+  include_tasks: deploy.yml
+  vars:
+    chart_name: elasticsearch
+    release_name: elasticsearch-master
+
+- name: ELK | Deploy elasticsearch data
+  include_tasks: deploy.yml
+  vars:
+    chart_name: elasticsearch
+    release_name: elasticsearch-data
+
+- name: ELK | Deploy logstash
+  include_tasks: deploy.yml
+  vars:
+    chart_name: logstash
+    release_name: logstash
+
+- name: ELK | Deploy filebeat
+  include_tasks: deploy.yml
+  vars:
+    chart_name: filebeat
+    release_name: filebeat
+
+
+# ES ready
+- name: ELK | Wait for elasticsearch
+  shell: |
+    ES_URL=http://localhost:9200;  kubectl exec -ti elasticsearch-master-0 -n logging -- curl -s -o /dev/null -w '%{http_code}\n' $ES_URL
+  register: es_health
+  until: "'200' in es_health.stdout_lines"
+  retries: 10
+  delay: 6
+
+# logstash ready
+- name: ELK | Wait for logstash
+  shell: |
+    LOG_URL=http://localhost:9600;  kubectl exec -ti logstash-logstash-0 -n logging -- curl -s -o /dev/null -w '%{http_code}\n' $LOG_URL
+  register: log_health
+  until: "'200' in log_health.stdout_lines"
+  retries: 10
+  delay: 6
+
+# 初始化ES
+- name: ELK | Initial ES
+  shell: |
+    ES_URL=http://localhost:9200
+    kubectl exec -ti elasticsearch-master-0 -n logging -- curl -X PUT "$ES_URL/_settings" -H 'Content-Type: application/json' -d'{"number_of_replicas":{{replica_count - 1 }}}'
+    kubectl exec -ti elasticsearch-master-0 -n logging -- curl -X PUT "$ES_URL/_ilm/policy/dkc_policy" -H 'content-type: application/json' -d '{"policy" : {"phases" : {"hot" : {"min_age" : "0ms","actions" : { }},"delete" : {"min_age" : "7d","actions" : {"delete" : {"delete_searchable_snapshot" : true}}}}}}'
+    kubectl exec -ti elasticsearch-master-0 -n logging -- curl -X PUT "$ES_URL/_template/dkc_template" -H 'content-type: application/json' -d '{"order" : 0,"index_patterns" : ["k8s-*"],"settings" : {"index" : {"lifecycle" : {"name" : "dkc_policy"}}},"mappings" : { },"aliases" : { }}'
+
+- name: ELK | Deploy kibana
+  include_tasks: deploy_kibana.yml
+
+

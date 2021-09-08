@@ -1,0 +1,22 @@
+elk_version: v7.12.0
+elk_enabled: false
+elk_chart_download_url: "https://somewhere.com.cn/elk-{{elk_version}}.tgz"
+
+elk_checksums:
+  amd64:
+    v7.12.0: 50ac822c1751e4109b915795915d9a7a63b2be3f80c0a005ce08801410ada6b0 # 如果和文件的sha256sum值不一致的话，会重新下载文件
+
+elk_checksum: "{{elk_checksums[image_arch][elk_version] }}"
+
+
+elasticsearch_image_repo: docker.elastic.co/elasticsearch/elasticsearch
+elasticsearch_image_tag: 7.12.0
+logstash_image_repo: docker.elastic.co/logstash/logstash
+logstash_image_tag: 7.12.0
+kibana_image_repo: docker.elastic.co/kibana/kibana
+kibana_image_tag: 7.12.0
+filebeat_image_repo: docker.elastic.co/beats/filebeat
+filebeat_image_tag: 7.12.0
+#bitnami_shell_image_repo: docker.io/bitnami/bitnami-shell
+#bitnami_shell_image_tag: 10
+

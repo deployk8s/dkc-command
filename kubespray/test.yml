@@ -1,0 +1,33 @@
+---
+
+#- hosts: kube-master[0]
+#  gather_facts: False
+#  vars:
+#    local_release_dir: /tmp/releases
+#    prometheus_stack_namespace: monitoring
+#    external_domain_name: www.test.com
+#  tasks:
+#    - name: test
+#      template:
+#        variable_start_string: "<<"
+#        variable_end_string: ">>"
+#        src: tests/templates/kube-prometheus-stack_values.yaml.j2
+#        dest: /tmp/kube-prometheus-stack_values.yaml.j2
+
+- hosts: db
+  gather_facts: False
+  vars:
+    parent: 'db'
+  tasks:
+    - name: Get mongodb repalica set group list
+      set_fact: rsGroups="{{ ((rsGroups | default([])) + hostvars[item].group_names) | select('match', '^rs\d+$') | list | unique }}"
+      with_items: "{{groups[parent]}}"
+    - debug: var=rsGroups
+    - name: Setup mongodb for all reaplica set groups
+      include_role:
+        name: mongod
+      loop: "{{ rsGroups }}"
+      loop_control:
+        loop_var: replicaset
+#  roles:
+#    - { role: mongod }

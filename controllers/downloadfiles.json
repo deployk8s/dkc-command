@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "name": "k8s-offline-install.tar",
+      "desc": "核心代码",
+      "state": "已存在"
+    },
+    {
+      "name": "kubespray_cache.tar",
+      "desc": "k8s 安装包",
+      "state": "下载中 90%"
+    },
+    {
+      "name": "centos7_9_2009.tar",
+      "desc": "el7 安装包",
+      "state": "不存在"
+    },
+    {
+      "name": "centos8_3_2011.tar",
+      "desc": "el8 安装包",
+      "state": "不存在"
+    }
+  ],
+  "code": 0,
+  "message": "success"
+}

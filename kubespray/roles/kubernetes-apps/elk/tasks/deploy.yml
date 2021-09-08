@@ -1,0 +1,13 @@
+- name: "ELK | set {{chart_name}} config"
+  template:
+    variable_start_string: "<<"
+    variable_end_string: ">>"
+    src: "{{release_name}}_values.yaml.j2"
+    dest: "{{local_release_dir}}/charts/{{chart_name}}/{{release_name}}_values.yaml"
+    backup: yes
+
+- name: "ELK | helm install {{chart_name}}"
+  shell:
+    cmd: "helm upgrade {{release_name}} . --install --namespace logging --create-namespace --wait -f {{release_name}}_values.yaml"
+    chdir: "{{local_release_dir}}/charts/{{chart_name}}"
+  ignore_errors: yes

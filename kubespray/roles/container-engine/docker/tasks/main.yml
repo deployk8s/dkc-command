@@ -1,0 +1,6 @@
+---
+- include_tasks: main-original.yml
+  when: not offline
+
+- include_tasks: main-offline.yml
+  when: offline

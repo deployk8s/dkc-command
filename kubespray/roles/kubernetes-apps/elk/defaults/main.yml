@@ -1,0 +1,23 @@
+elk_nodeSelector_data:
+  nodeType_logging_data: "true"
+
+elk_nodeSelector_master:
+  nodeType_logging_master: "true"
+#  nodeType: "om"
+
+elk_tolerations:
+  - key: "om.dkc"
+    operator: "Exists"
+    value: ""
+    effect: "NoExecute"
+
+elastic_storage_Gi: 30
+logstash_storage_Gi: 1
+
+elastic_storage_class_name: local-path
+elastic_master_storage_class_name: local-path
+
+logging_data_count: 1
+logging_master_count: 1
+replica_count: "{{ logging_data_count }}"
+min_master_count: "{%- if logging_master_count > 2 -%} 2 {%- else -%} 1 {%- endif -%}"

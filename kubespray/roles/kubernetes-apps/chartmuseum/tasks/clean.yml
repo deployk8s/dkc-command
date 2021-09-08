@@ -1,0 +1,4 @@
+- name: ChartMuseum | Clean directory
+  file:
+    path: "{{local_release_dir}}/charts/chartmuseum"
+    state: absent

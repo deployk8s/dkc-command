@@ -1,0 +1,21 @@
+- block:
+  - name: K8S Bash Completion
+    blockinfile:
+      path: ~/.bashrc
+      block: "source <(kubectl completion bash)"
+      state: present
+      create: yes
+      backup: yes
+      unsafe_writes: yes
+      marker: "# Ansible kubectl bash completion {mark}"
+
+  - name: K8S Bash Completion
+    file:
+      path: /etc/bash_completion.d
+      state: directory
+
+  - name: K8S Bash Completion
+    shell:
+      cmd: kubectl completion bash >/etc/bash_completion.d/kubectl
+  when:
+    - inventory_hostname in groups['kube_control_plane']

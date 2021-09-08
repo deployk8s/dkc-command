@@ -1,0 +1,13 @@
+- name: "ChartMuseum | set {{chart_name}} config"
+  template:
+    variable_start_string: "<<"
+    variable_end_string: ">>"
+    src: "{{chart_name}}_values.yaml.j2"
+    dest: "{{local_release_dir}}/charts/{{chart_name}}/{{chart_name}}_values.yaml"
+    backup: yes
+
+- name: "ChartMuseum | helm install {{chart_name}}"
+  shell:
+    cmd: "helm upgrade {{chart_name}} . --install --namespace {{chartmuseum_namespace}} --create-namespace --wait -f {{chart_name}}_values.yaml"
+    chdir: "{{local_release_dir}}/charts/{{chart_name}}"
+  ignore_errors: yes

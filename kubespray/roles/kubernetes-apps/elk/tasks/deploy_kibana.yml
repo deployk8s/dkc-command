@@ -1,0 +1,15 @@
+- name: ELK | Kibana sync auth
+  copy:
+    src: kibana_auth
+    dest:  "{{local_release_dir}}/charts/kibana/auth"
+
+- name: ELK | Kibana create secret
+  shell:
+    cmd: kubectl -n logging create secret generic basic-auth --from-file=./auth
+    chdir: "{{local_release_dir}}/charts/kibana"
+  ignore_errors: true
+
+- include_tasks: deploy.yml
+  vars:
+    chart_name: kibana
+    release_name: kibana

@@ -1,0 +1,5 @@
+---
+## set taints for db nodes
+node_taints:
+  - "db.surpass=true:NoExecute"
+

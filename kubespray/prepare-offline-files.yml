@@ -1,0 +1,79 @@
+---
+
+
+- hosts: localhost
+  gather_facts: false
+  tasks:
+#    - name: Clean artifact path
+#      file:
+#        state: absent
+#        path: /tmp/kubespray_cache
+#    - name: Copy cached files
+#      copy:
+#        src: ../kubespray_cache
+#        dest: /tmp/
+
+- hosts: k8s_cluster
+  gather_facts: true
+  tasks:
+    - name: judge parent path
+      connection: local
+      stat:
+        path: ../ansible
+      register: parent_path_register
+
+    - name: set parent path
+      set_fact:
+        parent_path: ".."
+      when: parent_path_register.stat.exists
+
+    - name: set parent path
+      set_fact:
+        parent_path: "../.."
+      when: not parent_path_register.stat.exists
+
+    - name: set el7 package path
+      set_fact:
+        packages: "centos7_9_2009"
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version == "7"
+    - name: set el8 package path
+      set_fact:
+        packages: "centos8_3_2011"
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version == "8"
+#    - name: Clean artifact path
+#      file:
+#        state: absent
+#        path: /tmp/required_pkgs
+    - name: Copy required packages
+      copy:
+        src: "{{parent_path}}/{{packages}}/required_pkgs"
+        dest: /tmp/
+        force: false
+#    - name: Clean artifact path
+#      file:
+#        state: absent
+#        path: /tmp/docker
+    - name: Copy docker packages
+      copy:
+        src: "{{parent_path}}/{{packages}}/docker"
+        dest: /tmp/
+        force: false
+
+    - name: Copy ntp packages
+      copy:
+        src: "{{parent_path}}/{{packages}}/ntp"
+        dest: /tmp/
+        force: false
+
+    - name: Copy git packages
+      copy:
+        src: "{{parent_path}}/{{packages}}/git"
+        dest: /tmp/
+        force: false
+      run_once: true
+      when:
+        - inventory_hostname == groups['kube_control_plane'][0]

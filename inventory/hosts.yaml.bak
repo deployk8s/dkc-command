@@ -1,0 +1,170 @@
+all:
+  vars:
+    version: 2
+    login_type: sshkey
+    external_domain_name: www.test.com
+    docker_daemon_graph: /var/lib/docker
+    mongodb_type: offline
+  hosts:
+    localhost:
+      remote_machine_username: root
+      remote_sshkey: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEowIBAAKCAQEAtyo7SVOoNqckLUyu1AM6nxerKl+NdptEMlakPeSYm261uRse
+        klXP2f8wHc1HSrUvX4R3J5z9/6D1qiflaRVy199yuSjHOMw5X2mEVrEBhhRVcMbj
+        eynGk7Vm2USM/lL5rTla5nHCHfK/Sznoovy9Sj2b/MqiLKdL71VhKfeN880EcABa
+        2AtcScukAlLrpPiZjel5+NUnz1sfI7HdobIZJbfyQoGSMoEquTywyXb4zPPn4uoF
+        xIgqG/UTKcG2QQxmPzvJIU7Z/emDRy0E6YpL12hpUS4F3eWdgn1eFCbkWyRf4ADc
+        93DFRwwOc41CSa3NHhZis3G/vZK17FJjHknysQIDAQABAoIBACVoqa0jOeLXpire
+        U4KXmjxt8BZ6Z4EG2xnQ2kCN1KFCLjk9EbRfdFEYrnIXv+zBLoi6nD9p7/JqpGH5
+        PgCFUexHBb5NVssB4uHawh2WjzIcKwsag9FeyeDXFsdfGdDDj5zSbv9L0pKdRnaN
+        wDaxmdN028v4csDd9kNOU8bneYWGTFE371pUuzBWHYph6hPR/W4wJJiwx2IF2e+B
+        1bGl9cXHzMSudmLMyJoQJNQ+Of/hPPwNml7CfRz2ySe08cFn7puwBRxRkMlALFSR
+        +1zZXaFKI7nvzAVfv9m5uHrS52OpSahXxeIuEnDWzLDZdDaR/sG60pjNJiaxZ2+t
+        NL2LG/ECgYEA4UU1q2Mg1gR7SUL9xxXhzUf+ZO0KsB/fjHRq02R6gIBZgKy9fxN+
+        2sj8LtqJUT4/JSNGEDf8wGc5GjOr4Vs9+vMO9rCVb/o4Nd3WqKYuWQC8zEhV9ddV
+        Z1M7xUp7M+ZrsrLEh+Dvidl87uCaqhcJP7lpHxLuivSZgHu4UNGr700CgYEA0Cai
+        +Bd8Cx4tLzAvjTiLClBoTbM7GTUXeAkT826MqQDp4UpFiVozThr3Bygm5McCFtvS
+        Hvf/G5s45oibVzIWGkmejGUVMn7YTt60+jogZomivRtxh48lSyz9C7Ru/68F9UTs
+        pkwdkwucXhCj4+qv7QwONQC9XnG6zGsGH/DapvUCgYBZIRMNDpmNVBSbdgAG5yeC
+        GzwSHp+d8951KhKiNR0q/p1rBe2r+8CzO9Zbi2fNVz2QqhYskJpWXgD/1vXoojsx
+        sT14aYGW3n+jAHTQIYAxAtOwV+Z68In/6bS6aK+6Zy6xc33C7UKZXg3KTd+j8J1e
+        MzPecZUkMYcSiODySSMn+QKBgCYCGBoTN7xT+041j0lLPOBaRGGDy9PThQCPL8xw
+        sFCf8RUJWd810E5/0AHHjCqUSEZiR2EOSdABrQczhKIMbErKjJ/4SUGaNedY9VUH
+        zijLEyNS4o0tT1MF2QMNJIOdswnRVyEanv/dy+TFRxf0H8G6RNHa27lmLQTsugaV
+        FWgNAoGBAJAyjbnwRMMN68TkvS9ShVUpvdW4tJylQs2y/L4xEfWKOTX0fApGsHps
+        GcpL4tBqc82bWLDx9TxK0V2IfParwFeKkgFa13gcWdd3BmOHLqN+IGkCbamPkpO2
+        N7DA3Qnl/SEQ7ElK4cUq5wI7fUuLjeg6ucS0B/begbEUiBNDbcGm
+        -----END RSA PRIVATE KEY-----
+    surpass-master-1:
+      ansible_host: 192.168.57.2
+      ansible_port: 22
+      node_labels: {}
+    surpass-master-2:
+      ansible_host: 192.168.57.3
+      ansible_port: 22
+      node_labels: {}
+    surpass-master-3:
+      ansible_host: 192.168.57.4
+      ansible_port: 22
+      node_labels: {}
+    surpass-worker-1:
+      ansible_host: 192.168.57.5
+      ansible_port: 22
+      node_labels:
+        nodeType_sg: 'true'
+        nodeType_registry: 'true'
+    surpass-worker-2:
+      ansible_host: 192.168.57.6
+      ansible_port: 22
+      node_labels:
+        nodeType_sg: 'true'
+    surpass-worker-3:
+      ansible_host: 192.168.57.7
+      ansible_port: 22
+      node_labels:
+        nodeType_sg: 'true'
+    surpass-worker-4:
+      ansible_host: 192.168.57.8
+      ansible_port: 22
+      node_labels:
+        nodeType_sg: 'true'
+    surpass-om-1:
+      ansible_host: 192.168.57.15
+      ansible_port: 22
+      node_labels:
+        nodeType_logging_data: 'true'
+        nodeType_logging_master: 'true'
+        nodeType_monitoring: 'true'
+      node_taints:
+        - om.surpass=true:NoExecute
+  children:
+    db:
+      children:
+        rs1: {}
+        rs2: {}
+    k8s_cluster:
+      vars:
+        minio_enabled: true
+        minio_storage_per_server: 10
+        registry_disk_size: 30Gi
+        prometheus_stack_enabled: true
+        grafana_storage_Gi: 10
+        alertmanager_storage_Gi: 10
+        prometheus_storage_Gi: 30
+        elk_enabled: true
+        elastic_storage_Gi: 50
+        logstash_storage_Gi: 1
+        local_path_provisioner_claim_root: /data
+        kube_service_addresses: 10.233.0.0/18
+        kube_pods_subnet: 10.233.64.0/18
+        csi_driver_nfs_enabled: false
+        csi_driver_nfs_server: xxxxxxxxxx.cn-zhangjiakou.nas.aliyuncs.com
+        csi_driver_nfs_path: /
+        prometheus_storage_class_name: local-path
+        minio_storage_class_name: local-path
+        elastic_master_storage_class_name: local-path
+        registry_enabled: true
+        registry_storage_class: local-path
+        registry_nodeSelector:
+          nodeType_registry: 'true'
+        prometheus_stack_nodeselector:
+          nodeType_monitoring: 'true'
+        minio_nodeSelector: {}
+        logging_data_count: 1
+        logging_master_count: 1
+        minio_servers_count: 4
+      children:
+        kube_control_plane: {}
+        kube_node: {}
+    kube_control_plane:
+      vars:
+        ops_namespace: ops
+        ops_mongodb_ips: >-
+          mongodb://surpass:bizconf_surpass@192.168.57.8:30003,192.168.57.7:30003/surpass_ops?replicaSet=rs0
+      hosts:
+        surpass-master-1: {}
+        surpass-master-2: {}
+        surpass-master-3: {}
+    etcd:
+      children:
+        kube_control_plane: {}
+    kube_node:
+      children:
+        db: {}
+        sg: {}
+        om: {}
+      hosts:
+        surpass-worker-1: {}
+        surpass-worker-2: {}
+        surpass-worker-3: {}
+        surpass-worker-4: {}
+    rs1:
+      vars:
+        rs1_port: 30003
+        mongodb_data_dir: /mongodb
+        admin_user: admin
+        admin_password: surpass_admin
+        surpass_user: surpass
+        surpass_password: bizconf_surpass
+      hosts:
+        surpass-worker-2:
+          rs1_role: arbiter
+        surpass-worker-3:
+          rs1_role: secondary
+        surpass-worker-4:
+          rs1_role: primary
+    rs2: {}
+    sg1:
+      hosts:
+        surpass-worker-1: {}
+        surpass-worker-2: {}
+        surpass-worker-3: {}
+        surpass-worker-4: {}
+    sg:
+      children:
+        sg1: {}
+    om:
+      vars: {}
+      hosts:
+        surpass-om-1: {}

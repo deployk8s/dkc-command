@@ -1,0 +1,5 @@
+#chartmuseum_enabled: true
+chartmuseum_namespace: "{{ registry_namespace|default('registry')}}"
+registry_storage_class: local-path
+registry_nodeSelector:
+  nodeType_registry: "true"

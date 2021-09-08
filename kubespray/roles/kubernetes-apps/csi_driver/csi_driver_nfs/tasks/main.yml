@@ -1,0 +1,47 @@
+- name: CSI Driver NFS | Clean
+  include_tasks: clean.yml
+
+- name: CSI Driver NFS | Download Chart
+  include_tasks: "{{ playbook_dir }}/roles/download/tasks/download_chart.yml"
+  vars:
+    download: "{{ download_defaults | combine(downloads.csi_driver_nfs_chart) }}"
+
+- name: CSI Driver NFS | Deploy CSI Driver NFS
+  include_tasks: deploy.yml
+  vars:
+    chart_name: csi-driver-nfs
+
+- name: CSI Driver NFS | Template StorageClass
+  template:
+    src: "storageClass.yaml.j2"
+    dest: "{{local_release_dir}}/charts/csi-driver-nfs/storageClass.yaml"
+    backup: yes
+
+- name: CSI Driver NFS | Create StorageClass
+  shell:
+    cmd: kubectl apply -f storageClass.yaml
+    chdir: "{{local_release_dir}}/charts/csi-driver-nfs"
+
+- name: CSI Driver NFS | Template Test
+  template:
+    src: "pvc.yaml.j2"
+    dest: "{{local_release_dir}}/charts/csi-driver-nfs/pvc.yaml"
+    backup: yes
+
+- name: CSI Driver NFS | Template Test
+  shell:
+    cmd: kubectl apply -f pvc.yaml -n {{csi_driver_nfs_namespace}}
+    chdir: "{{local_release_dir}}/charts/csi-driver-nfs"
+
+- name: CSI Driver NFS | Asset pvc exist
+  shell: |
+    kubectl get pvc -n {{csi_driver_nfs_namespace}} --field-selector metadata.name=pvc-deployment-nfs -o jsonpath='{.items[0].status.phase}'
+  register: minio_health
+  until: "'Bound' in minio_health.stdout_lines"
+  retries: 10
+  delay: 6
+
+- name: CSI Driver NFS | Template Test
+  shell:
+    cmd: kubectl delete -f pvc.yaml -n {{csi_driver_nfs_namespace}}
+    chdir: "{{local_release_dir}}/charts/csi-driver-nfs"

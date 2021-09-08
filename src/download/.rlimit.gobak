@@ -1,0 +1,41 @@
+package download
+
+import (
+	"syscall"
+
+	"github.com/deployKubernetesInCHINA/dkc-command/src"
+)
+
+type rlimit struct {
+	oldRlimit, newRlimit syscall.Rlimit
+	isOpen               bool
+}
+
+func newRlimit() (*rlimit, error) {
+	var r rlimit
+	err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &r.oldRlimit)
+	return &r, err
+}
+
+func (r *rlimit) open() error {
+
+	r.newRlimit.Max = 99999
+	r.newRlimit.Cur = 99999
+	if r.oldRlimit.Max < r.newRlimit.Max {
+		err := syscall.Setrlimit(syscall.RLIMIT_NOFILE, &r.newRlimit)
+		if err != nil {
+			log.Log.Println("Error Setting Rlimit ", err)
+		} else {
+			r.isOpen = true
+		}
+		return err
+	}
+	return nil
+}
+
+func (r *rlimit) close() {
+	if r.isOpen {
+		r.isOpen = false
+		syscall.Setrlimit(syscall.RLIMIT_NOFILE, &r.oldRlimit)
+	}
+}

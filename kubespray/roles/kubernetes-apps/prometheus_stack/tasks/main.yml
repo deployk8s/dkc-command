@@ -1,0 +1,80 @@
+---
+- name: Prometheus Stack | Generate Secret
+  shell: |
+    kubectl create namespace "{{prometheus_stack_namespace}}"
+    kubectl -n "{{prometheus_stack_namespace}}" create secret generic etcd-client-cert --from-file=/etc/kubernetes/ssl/etcd/healthcheck-client.crt --from-file=/etc/kubernetes/ssl/etcd/healthcheck-client.key --from-file=/etc/kubernetes/ssl/etcd/ca.crt
+  when:
+    - inventory_hostname == groups['kube_control_plane'][0]
+  ignore_errors: yes
+
+- name: Prometheus Stack | Download
+  include_tasks: "{{ playbook_dir }}/roles/download/tasks/download_chart.yml"
+  vars:
+    download: "{{ download_defaults | combine(downloads.prometheus_stack_bundle_chart) }}"
+
+- name: Prometheus Stack | Copy Chart.yaml
+  template:
+    variable_start_string: "<<"
+    variable_end_string: ">>"
+    src: "kube-prometheus-stack_chart.yaml.j2"
+    dest: "{{local_release_dir}}/charts/kube-prometheus-stack/Chart.yaml"
+    backup: yes
+  register: prometheus_stack_chart
+  when:
+    - inventory_hostname == groups['kube_control_plane'][0]
+
+- name: Prometheus Stack | Render values.yaml
+  template:
+    variable_start_string: "<<"
+    variable_end_string: ">>"
+    src: "kube-prometheus-stack_values.yaml.j2"
+    dest: "{{local_release_dir}}/charts/kube-prometheus-stack/values.yaml"
+    backup: yes
+  register: prometheus_stack_values
+  when:
+    - inventory_hostname == groups['kube_control_plane'][0]
+
+- name: Prometheus Stack | Install chart
+  command: >
+    helm upgrade prometheus-stack ./kube-prometheus-stack --install --wait --wait-for-jobs
+    --create-namespace --namespace {{ prometheus_stack_namespace }}
+  args:
+    chdir: "{{local_release_dir}}/charts"
+  delegate_to: "{{ groups['kube_control_plane'][0] }}"
+  run_once: true
+  register: prometheus_stack_chart_install
+  ignore_errors: yes
+
+- name: Prometheus Stack | Update rules.yaml
+  template:
+    variable_start_string: "<<"
+    variable_end_string: ">>"
+    src: "prometheus.rules.yaml.j2"
+    dest: "{{local_release_dir}}/charts/kube-prometheus-stack/prometheus.rules.yaml"
+    backup: yes
+  when:
+    - inventory_hostname == groups['kube_control_plane'][0]
+
+- name: Prometheus Stack | Apply rules.yaml
+  shell:
+    cmd: kubectl apply -f prometheus.rules.yaml
+    chdir: "{{local_release_dir}}/charts/kube-prometheus-stack/"
+  when:
+    - inventory_hostname == groups['kube_control_plane'][0]
+
+- name: Prometheus Stack | Update alertmanager-config.yaml
+  template:
+    variable_start_string: "<<"
+    variable_end_string: ">>"
+    src: "alertmanager-config.yaml.j2"
+    dest: "{{local_release_dir}}/charts/kube-prometheus-stack/alertmanager-config.yaml"
+    backup: yes
+  when:
+    - inventory_hostname == groups['kube_control_plane'][0]
+
+- name: Prometheus Stack | Apply alertmanager-config.yaml
+  shell:
+    cmd: kubectl apply -f alertmanager-config.yaml
+    chdir: "{{local_release_dir}}/charts/kube-prometheus-stack/"
+  when:
+    - inventory_hostname == groups['kube_control_plane'][0]

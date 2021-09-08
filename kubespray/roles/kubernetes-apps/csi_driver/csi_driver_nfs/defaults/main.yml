@@ -1,0 +1,4 @@
+csi_driver_nfs_enabled: false
+csi_driver_nfs_server: 127.0.0.1
+csi_driver_nfs_path: / #support subpath
+csi_driver_nfs_namespace: nfs

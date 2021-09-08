@@ -1,0 +1,7 @@
+---
+registry_namespace: "registry"
+registry_storage_class: "local-path"
+registry_disk_size: "10Gi"
+registry_port: 5000
+registry_nodeSelector:
+  nodeType_registry: "true"

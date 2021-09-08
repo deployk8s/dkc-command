@@ -1,0 +1,23 @@
+---
+- name: Check ansible version
+  import_playbook: ansible_version.yml
+
+- name: Ensure compatibility with old groups
+  import_playbook: legacy_groups.yml
+
+- name: Copy ssh key to cluster nodes
+  import_playbook: passwordlessWithSSHkey.yml
+  when:
+    - login_type is defined and login_type == 'sshkey'
+
+- name: Copy ssh key to cluster nodes
+  import_playbook: passwordless.yml
+
+- name: Prepare offline files
+  import_playbook: prepare-offline-files.yml
+
+- name: Set NTP and Timezone
+  import_playbook: timedate.yml
+
+- name: Disable firewall
+  import_playbook: disable-firewall.yml

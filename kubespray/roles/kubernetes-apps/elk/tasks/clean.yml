@@ -1,0 +1,19 @@
+- name: ELK | Clean directory
+  file:
+    path: "{{local_release_dir}}/charts/elasticsearch"
+    state: absent
+
+- name: ELK | Clean directory
+  file:
+    path: "{{local_release_dir}}/charts/kibana"
+    state: absent
+
+- name: ELK | Clean directory
+  file:
+    path: "{{local_release_dir}}/charts/logstash"
+    state: absent
+
+- name: ELK | Clean directory
+  file:
+    path: "{{local_release_dir}}/charts/filebeat"
+    state: absent

@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+#    nginx.ingress.kubernetes.io/app-root: /storage/
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/storage)$ $1/ redirect;
+      rewrite ^/stylesheets/(.*)$ /storage/stylesheets/$1 redirect;
+      rewrite ^/images/(.*)$ /storage/images/$1 redirect;
+      rewrite ^/static/(.*)$ /storage/static/$1 redirect;
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  name: minio
+spec:
+  rules:
+    - host: {{external_domain_name}}
+      http:
+        paths:
+          - backend:
+              service:
+                name: minio
+                port:
+                  number: 80
+            path: /storage(/|$)(.*)
+            pathType: ImplementationSpecific
+status:
+  loadBalancer: {}

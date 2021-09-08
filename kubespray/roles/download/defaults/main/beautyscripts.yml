@@ -1,0 +1,8 @@
+kubensx_version: 0.2.0
+kubensx_download_url: "https://somewhere.com.cn/kubensx-{{kubensx_version}}.tgz"
+
+kubensx_checksums:
+  amd64:
+    0.2.0: 9bfb0e56961e447fc5a5c2ffe686a9ffeec6a53f00f486c36fe04a03e7705783 # 如果和文件的sha256sum值不一致的话，会重新下载文件
+
+kubensx_checksum: "{{kubensx_checksums[image_arch][kubensx_version] }}"

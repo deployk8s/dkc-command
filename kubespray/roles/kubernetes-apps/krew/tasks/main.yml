@@ -1,0 +1,33 @@
+---
+- name: Krew | install krew on kube_control_plane
+  import_tasks: krew.yml
+
+- name: Krew | install krew on localhost
+  import_tasks: krew.yml
+  delegate_to: localhost
+  connection: local
+  run_once: true
+  when: kubectl_localhost
+
+#- name: Krew | ensure git exist on kube_control_plane
+#  package:
+#    name: git
+#    state: present
+#  check_mode: true
+#  register: package_check
+
+- name: Krew | Check if git package is installed or not on Centos family"
+  command: rpm -q git
+  register: package_check
+  changed_when: false
+  ignore_errors: true
+  when:
+    - ansible_distribution == "CentOS"
+
+- include_tasks: git.yml
+  when: package_check is defined and package_check is failed
+
+# krew need initialized
+#- name: Krew | initialized
+#  shell: kubectl krew update
+#  ignore_errors: true

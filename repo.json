@@ -1,0 +1,27 @@
+[
+  {
+    "name": "centos8_3_2011.tar",
+    "desc": "el8 安装包",
+    "total": "249 Mib"
+  },
+  {
+    "name": "centos7_9_2009.tar",
+    "desc": "el7 安装包",
+    "total": "233 Mib"
+  },
+  {
+    "name": "ansible.tar",
+    "desc": "ansible 安装包",
+    "total": "22 Mib"
+  },
+  {
+    "name": "k8s-offline-install.tar",
+    "desc": "安装剧本",
+    "total": "6 Mib"
+  },
+  {
+    "name": "kubespray_cache.tar.gz",
+    "desc": "k8s 安装包",
+    "total": "3585 Mib"
+  }
+]

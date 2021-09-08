@@ -1,0 +1,11 @@
+- name: "CSI Driver NFS | set {{chart_name}} config"
+  template:
+    src: "{{chart_name}}_values.yaml.j2"
+    dest: "{{local_release_dir}}/charts/{{chart_name}}/{{chart_name}}_values.yaml"
+    backup: yes
+
+- name: "CSI Driver NFS | helm install {{chart_name}}"
+  shell:
+    cmd: "helm upgrade {{chart_name}} . --install --namespace {{csi_driver_nfs_namespace}} --create-namespace --wait -f {{chart_name}}_values.yaml"
+    chdir: "{{local_release_dir}}/charts/{{chart_name}}"
+  ignore_errors: yes

@@ -1,0 +1,24 @@
+clusterName: "elasticsearch"
+nodeGroup: "data"
+
+replicas: << logging_data_count >>
+
+roles:
+  master: "false"
+  ingest: "true"
+  data: "true"
+  ml: "false"
+  remote_cluster_client: "false"
+
+persistence:
+  enabled: true
+
+volumeClaimTemplate:
+  storageClassName: <<elastic_storage_class_name>>
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: << elastic_storage_Gi >>Gi
+
+nodeSelector:
+  << elk_nodeSelector_data >>

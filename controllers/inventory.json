@@ -1,0 +1,40 @@
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "ingress": "",
+    "remote": {
+      "username": "username",
+      "password": "password"
+    },
+    "hosts": [
+      {
+        "ip": "192.168.57.1",
+        "hostname": "surpass-master-1",
+        "master": true,
+        "mongo": "arbiter"
+      },
+      {
+        "ip": "192.168.57.2",
+        "hostname": "surpass-master-2",
+        "master": true,
+        "mongo": "primary",
+        "node": false,
+        "sg": true,
+        "om": false
+      },
+      {
+        "ip": "192.168.57.3",
+        "hostname": "surpass-master-3",
+        "master": true,
+        "mongo": "secondary"
+      },
+      {
+        "ip": "192.168.57.4",
+        "hostname": "surpass-worker-1",
+        "master": false,
+        "mongo": ""
+      }
+    ]
+  }
+}

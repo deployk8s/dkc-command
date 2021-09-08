@@ -1,0 +1,36 @@
+clusterName: "elasticsearch"
+nodeGroup: "master"
+
+replicas: << logging_master_count >>
+minimumMasterNodes: << min_master_count >>
+
+roles:
+  master: "true"
+  ingest: "false"
+  data: "false"
+  ml: "false"
+  remote_cluster_client: "false"
+
+persistence:
+  enabled: true
+
+volumeClaimTemplate:
+  storageClassName: <<elastic_master_storage_class_name>>
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 1Gi
+
+nodeSelector:
+  << elk_nodeSelector_master >>
+
+extraInitContainers:
+  - name: chmod
+    image: busybox:1.31.1
+    command: ['chmod', '777', '-R','/usr/share/elasticsearch/data']
+    securityContext:
+      privileged: true
+      runAsUser: 0
+    volumeMounts:
+    - mountPath: /usr/share/elasticsearch/data
+      name: elasticsearch-master

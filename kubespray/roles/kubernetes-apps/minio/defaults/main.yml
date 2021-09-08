@@ -1,0 +1,19 @@
+minio_servers_count: 1
+minio_storage_per_server: 10
+minio_storage_class_name: local-path
+minio_nodeSelector:
+  nodeType_minio: "true"
+
+minio_tolerations:
+  - effect: "NoExecute"
+    key: "db.dkc"
+    operator: "Exists"
+    value: ""
+
+minio_volumes_per_server: "{%- if minio_servers_count > 1 -%}2{%- else -%}4{%- endif -%}"
+
+minio_storage_per_volume_Gi: "{%- if minio_servers_count == 1 -%}
+  {{minio_storage_per_server/4}}
+{%- else -%}
+    {{minio_storage_per_server/2}}
+{%- endif -%}"
