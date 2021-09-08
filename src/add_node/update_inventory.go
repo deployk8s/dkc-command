@@ -33,7 +33,7 @@ func updateInventory() {
 		AnsibleHost: config.Kconfig.Ip,
 		AnsiblePort: 22,
 	}
-	i.All.Children["kube-node"].Hosts[config.Kconfig.Hostname] = inventory.Variable{}
+	i.All.Children["kube_node"].Hosts[config.Kconfig.Hostname] = inventory.Variable{}
 
 	d, _ := yaml.Marshal(i)
 	err := os.WriteFile(config.InventoryPath, d, 0644)
