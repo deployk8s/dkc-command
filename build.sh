@@ -10,7 +10,7 @@ rm -f dkc.tar.gz dkc.zip
 mkdir -p dkc
 rm -rf dkc/*
 
-CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o dkc/dkc-linux-amd64 .
+CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o dkc/dkc .
 CGO_ENABLED=0 GOOS=darwin go build -a -installsuffix cgo -o dkc/dkc-darwin .
 CGO_ENABLED=0 GOOS=windows go build -a -installsuffix cgo -o dkc/dkc.exe .
 
