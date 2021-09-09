@@ -47,7 +47,7 @@ func newDownloadCMD() *cobra.Command {
 			download.Download()
 		},
 	}
-	downloadCacheCmd.PersistentFlags().StringVarP(&mirror, "mirror", "m", "http://packages.bizconf.cn/packages/offline/", "下载地址 例: http://packages.bizconf.cn/packages/offline/, http://bizconf:bizconf@10.184.101.14:8000")
+	downloadCacheCmd.PersistentFlags().StringVarP(&mirror, "mirror", "m", "https://cachex.oss-cn-wulanchabu.aliyuncs.com/cache", "下载地址 例: https://cachex.oss-cn-wulanchabu.aliyuncs.com/cache")
 	downloadCacheCmd.PersistentFlags().BoolVarP(&md5, "check-md5", "c", true, "下载之后检查MD5, 要求:本机可用内存在4G以上.")
 	//downloadCacheCmd.PersistentFlags().BoolVarP(&cache, "use-cache", "u", false, "说明: 1.当离线文件压缩包存在时,不进行下载 2. 不存在时,进行下载.之后不删除离线文件压缩包")
 
