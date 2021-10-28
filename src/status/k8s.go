@@ -5,12 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/TwinProduction/go-color"
 
 	"github.com/deployKubernetesInCHINA/dkc-command/src"
+	"github.com/deployKubernetesInCHINA/dkc-command/src/config"
 	"github.com/deployKubernetesInCHINA/dkc-command/src/pkg/inventory"
 	"github.com/deployKubernetesInCHINA/dkc-command/src/pkg/log"
+	"github.com/deployKubernetesInCHINA/dkc-command/src/status/checker"
+	"github.com/deployKubernetesInCHINA/dkc-command/src/status/checker/pkg/context"
 )
 
 func newEtcdTable() *src.Table {
@@ -48,6 +52,7 @@ func showK8sStatus(i *inventory.Inventory) {
 				instance.Run("kubectl get nodes -o wide")
 
 				//conditions
+				fmt.Println()
 				log.Log.Info("Nodes status:")
 				var st []status
 				out, _ := instance.CombinedOutput("kubectl get nodes -o jsonpath='{\"[\"}{range .items[*]}{\"{\"}{\"\\\"addresses\\\":\"}{.status.addresses}{\",\"}{\"\\\"conditions\\\":\"}{.status.conditions}{\"}\"}{\",\"}{end}{\"]\"}'")
@@ -78,21 +83,54 @@ func showK8sStatus(i *inventory.Inventory) {
 						}
 					}
 					if !flag {
-						fmt.Println("  ",hostname, "healthy")
+						fmt.Println("  ", hostname, "healthy")
 					} else {
-						fmt.Println(color.Ize(color.Red,fmt.Sprintf("  %s %s",hostname, "is unhealthy")))
+						fmt.Println(color.Ize(color.Red, fmt.Sprintf("  %s %s", hostname, "is unhealthy")))
 						for _, s := range strs {
 							fmt.Println(s)
 						}
 					}
 				}
 				// helm release status
-				log.Log.Info("Helm release List:")
-				instance.Run("helm ls --all-namespaces")
+				fmt.Println()
+				log.Log.Info("Helm Error List:")
+				if config.Kconfig.Show {
+					//debug模式
+					instance.Run("helm ls --all-namespaces")
+				} else {
+					instance.Run("helm ls --all-namespaces | grep -v deployed")
+				}
 				// pod failed status
-				log.Log.Info("Not Running Pods List:")
+				fmt.Println()
+				log.Log.Info("Pods Not Running List:")
 				instance.Run("kubectl get pods --all-namespaces |grep -v Running")
-				break
+
+				// init ctx
+				ctx := context.Context{
+					Client:    *instance,
+					Inventory: *i,
+					Out:       &sync.Map{},
+				}
+				if v, ok := ctx.Inventory.All.Children["k8s_cluster"].Vars["logging_data_count"]; ok {
+					ctx.OmCount = v.(int)
+				}
+
+				// apps status
+				fmt.Println()
+				log.Log.Info("Apps Error List:")
+				ac := checker.NewAppCheckers()
+				ac.Run(ctx)
+
+				fmt.Println()
+				log.Log.Info("Configuration Error List:")
+				cc := checker.NewConfigurationCheckers()
+				cc.Run(ctx)
+				//check default storageclass
+				//check nfs
+				//check minio
+				//ping pod ip
+				fmt.Println()
+				return
 			}
 		}
 	}

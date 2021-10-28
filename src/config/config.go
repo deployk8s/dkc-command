@@ -60,20 +60,6 @@ func InitDownload() {
 	Kconfig.Cache = viper.GetBool("use-cache")
 }
 
-func InitDownloadSurpass() {
-	initGlobal()
-
-	Kconfig.DockerUser = viper.GetString("docker-user")
-	Kconfig.DockerPassword = viper.GetString("docker-password")
-	Kconfig.OnlyOne = viper.GetString("only-one")
-	Kconfig.Fool = viper.GetBool("fool")
-	Kconfig.ChartRepo = strings.TrimSpace(viper.GetString("chart-repo"))
-	Kconfig.GenerateOnly = viper.GetBool("generate-only")
-	Kconfig.OpsappsOnly = viper.GetBool("opsapps")
-	Kconfig.TemplateDir = viper.GetString("template-dir")
-	//Kconfig.ChartVersion = viper.GetString("chart-version")
-}
-
 func initGlobal() {
 	Kconfig.InventoryFile = viper.GetString("inventory-file")
 	Kconfig.DownloadDir = "."
@@ -101,6 +87,9 @@ func InitStatus() {
 	initGlobal()
 }
 func InitUninstall() {
+	initGlobal()
+}
+func InitUpgrade() {
 	initGlobal()
 }
 func InitAddNode() {

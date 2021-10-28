@@ -31,20 +31,20 @@ func newNodeCMD() *cobra.Command {
 	var commandAdd = &cobra.Command{
 		Use:   "add",
 		Short: "增加k8s node节点,不支持批量增加",
-		Long:  fmt.Sprintf(`增加k8s node节点,不支持批量增加. 示例: %s node add --hostname surpass-worker-2 --ip 192.168.57.4`, os.Args[0]),
+		Long:  fmt.Sprintf(`增加k8s node节点,不支持批量增加. 示例: %s node add --hostname dkc-worker-2 --ip 192.168.57.4`, os.Args[0]),
 		//TraverseChildren: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			add_node.AddNode()
 		},
 	}
-	command.PersistentFlags().StringVar(&hostname, "hostname", "", "增加节点的hostname, 例: surpass-worker-2")
+	command.PersistentFlags().StringVar(&hostname, "hostname", "", "增加节点的hostname, 例: dkc-worker-2")
 	command.PersistentFlags().BoolVarP(&only_update_inventory, "only-update-inventory", "o", false, "只更新inventory/hosts.yaml, 不进行k8s add/del node实际操作")
 	commandAdd.PersistentFlags().StringVar(&ip, "ip", "", "增加节点的ip地址, 例: 192.168.57.4")
 
 	var commandRemove = &cobra.Command{
 		Use:   "del",
 		Short: "删除k8s node节点,不支持批量删除",
-		Long:  fmt.Sprintf(`删除k8s node节点,不支持批量删除. 示例: %s node del --hostname surpass-worker-2`, os.Args[0]),
+		Long:  fmt.Sprintf(`删除k8s node节点,不支持批量删除. 示例: %s node del --hostname dkc-worker-2`, os.Args[0]),
 		//TraverseChildren: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			remove_node.RemoveNode()
