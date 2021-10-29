@@ -59,6 +59,7 @@ func Untar(tarball, target string) error {
 			return err
 		}
 	}
-	log.Log.Info("done.")
+	log.Log.Info("解压成功. 删除 ", tarball)
+	os.Remove(tarball)
 	return nil
 }

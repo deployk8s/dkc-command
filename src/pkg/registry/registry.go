@@ -35,24 +35,7 @@ const (
 	isSpace
 )
 
-//{
-//  "iss": "dockerauth.aliyuncs.com",
-//  "aud": "registry.aliyuncs.com:cn-zhangjiakou:26842",
-//  "sub": "",
-//  "iat": 1625625304,
-//  "jti": "QQYYhAtkeEQpZWvNi7IMEQ",
-//  "nbf": 1625625004,
-//  "exp": 1625625904,
-//  "access": [
-//    {
-//      "name": "bizconf_devops/bizconf_global_directory",
-//      "type": "repository",
-//      "actions": [
-//        "pull"
-//      ]
-//    }
-//  ]
-//}
+
 type Access struct {
 	Name    string   `json:"name"`
 	Type    string   `json:"type"`
@@ -184,26 +167,6 @@ func parse(p string) ([]byte, error) {
 	return payload, nil
 }
 
-// TokenExpired returns wheither or not an auth token has expired
-//jwt payload:
-//{
-//  "iss": "dockerauth.aliyuncs.com",
-//  "aud": "registry.aliyuncs.com:cn-zhangjiakou:26842",
-//  "sub": "",
-//  "iat": 1627353386,
-//  "jti": "0tdMy4S1dGqd-jNM2Tly_A",
-//  "nbf": 1627353086,
-//  "exp": 1627353986,
-//  "access": [
-//    {
-//      "name": "bizconf_devops/bizconf_epdevice_manager",
-//      "type": "repository",
-//      "actions": [
-//        "pull"
-//      ]
-//    }
-//  ]
-//}
 func (reg *Registry) TokenExpired(repoName string) bool {
 	//每个repo都需要重新获取token
 

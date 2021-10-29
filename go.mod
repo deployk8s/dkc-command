@@ -13,6 +13,7 @@ require (
 	github.com/gizak/termui/v3 v3.1.0
 	github.com/go-ini/ini v1.63.0
 	github.com/opencontainers/go-digest v1.0.0
+	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
