@@ -38,7 +38,7 @@ func removeUseAnsible() {
 	if err != nil {
 		log.Log.Fatal(err.Error())
 	}
-	if src.CheckYes("Remove k8s node with local ansible 2.9.18 ") {
+	if config.Kconfig.Yes || src.CheckYes("Remove k8s node with local ansible 2.9.18 ") {
 
 		for _, v := range cmds {
 			v.Stdout = io.MultiWriter(os.Stdout, logfile)
