@@ -1,4 +1,0 @@
-- name: CSI NFS | Clean directory
-  file:
-    path: "{{local_release_dir}}/charts/csi-driver-nfs"
-    state: absent
