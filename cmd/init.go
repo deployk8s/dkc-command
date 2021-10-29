@@ -12,6 +12,7 @@ import (
 
 var log bool
 var iFile string
+var yes bool
 
 var rootCmd = &cobra.Command{
 	Use:     fmt.Sprintf("%s [subcommand]", os.Args[0]),
@@ -36,15 +37,14 @@ func Execute() {
 func init() {
 	// rootCmd.PersistentFlags().BoolVarP(&version, "version", "v", false, "Print the version number of scheduler")
 	rootCmd.PersistentFlags().BoolVar(&log, "debug", false, "show debug logs")
-	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
+	rootCmd.PersistentFlags().BoolVarP(&yes, "yes", "y", false, "exec command without ask")
 	rootCmd.PersistentFlags().StringVarP(&iFile, "inventory-file", "i", config.InventoryPath, "拓扑文件hosts.yaml")
-	viper.BindPFlag("inventory-file", rootCmd.PersistentFlags().Lookup("inventory-file"))
+	viper.BindPFlags(rootCmd.PersistentFlags())
 
 	cobra.OnInitialize()
 	rootCmd.AddCommand(newDownloadCMD())
 	rootCmd.AddCommand(newPrepareCMD())
 	rootCmd.AddCommand(newInstallCMD())
-	rootCmd.AddCommand(newWebCMD())
 	rootCmd.AddCommand(newStatusCMD())
 	rootCmd.AddCommand(newUninstallCMD())
 	rootCmd.AddCommand(newNodeCMD())

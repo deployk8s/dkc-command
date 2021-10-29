@@ -26,7 +26,7 @@ func embarkData(t *src.Table, tds []inventory.Host) {
 		} else {
 			log.Log.Error(err.Error())
 		}
-		var rma, rn, rsg, rmon, rlog string
+		var rma, rn, rsg, rom string
 
 		if row.IsMaster {
 			rma = "yes"
@@ -34,11 +34,8 @@ func embarkData(t *src.Table, tds []inventory.Host) {
 		if row.IsNode {
 			rn = "yes"
 		}
-		if row.IsLogging {
-			rlog = "yes"
-		}
-		if row.IsMonitoring {
-			rmon = "yes"
+		if row.IsOm {
+			rom = "yes"
 		}
 		//if row.IsTracking {
 		//	rtra = "yes"
@@ -52,8 +49,7 @@ func embarkData(t *src.Table, tds []inventory.Host) {
 			{Align: simpletable.AlignCenter, Text: rma},
 			{Align: simpletable.AlignCenter, Text: rn},
 			{Align: simpletable.AlignCenter, Text: row.IsMongo},
-			{Align: simpletable.AlignCenter, Text: rlog},
-			{Align: simpletable.AlignCenter, Text: rmon},
+			{Align: simpletable.AlignCenter, Text: rom},
 			//{Text: rtra},
 			{Align: simpletable.AlignCenter, Text: rsg},
 			{Align: simpletable.AlignCenter, Text: row.Ip},

@@ -4,11 +4,10 @@ import (
 	"io/ioutil"
 	"sort"
 
-	"golang.org/x/crypto/ssh"
-	"gopkg.in/yaml.v2"
-
 	"github.com/deployKubernetesInCHINA/dkc-command/src/config"
 	"github.com/deployKubernetesInCHINA/dkc-command/src/pkg/log"
+	"golang.org/x/crypto/ssh"
+	"gopkg.in/yaml.v2"
 )
 
 type Inventory struct {
@@ -30,6 +29,7 @@ type ChildrenStruct struct {
 	Db         ChildrenBaseStruct `yaml:"db"`
 	KubeNode   ChildrenBaseStruct `yaml:"kube_node"`
 	K8sCluster ChildrenBaseStruct `yaml:"k8s_cluster"`
+	Nfs        ChildrenBaseStruct `yaml:"nfs"`
 }
 
 type Variable map[string]interface{}
@@ -48,20 +48,27 @@ type HostInfo struct {
 	AnsibleHost           string            `yaml:"ansible_host,omitempty"`
 	AnsiblePort           int               `yaml:"ansible_port,omitempty"`
 	NodeLabels            map[string]string `yaml:"node_labels,omitempty"`
+	NodeTaints            []string          `yaml:"node_taints,omitempty"`
 }
 type All struct {
-	Variables Vars                `yaml:"vars"`
-	Hosts     map[string]HostInfo `yaml:"hosts"`
-	Children  map[string]ChildrenBaseStruct
+	Variables Vars                          `yaml:"vars"`
+	Hosts     map[string]HostInfo           `yaml:"hosts"`
+	Children  map[string]ChildrenBaseStruct `yaml:"children"`
 }
 
 type Vars struct {
 	ExternalDomainName      string   `yaml:"external_domain_name"`
 	LoginType               string   `yaml:"login_type"`
 	MongodbType             string   `yaml:"mongodb_type"`
-	MongodbAliyunPassword   string   `yaml:"mongodb_aliyun_password"`
-	MongodbAliyunServers    []string `yaml:"mongodb_aliyun_servers"`
-	MongodbAliyunReplicaset string   `yaml:"mongodb_aliyun_replicaset"`
+	MongodbAliyunPassword   string   `yaml:"mongodb_aliyun_password,omitempty"`
+	MongodbAliyunServers    []string `yaml:"mongodb_aliyun_servers,omitempty"`
+	MongodbAliyunReplicaset string   `yaml:"mongodb_aliyun_replicaset,omitempty"`
+	NfsType                 string   `yaml:"nfs_type,omitempty"`
+	AnsibleUser             string   `yaml:"ansible_user,omitempty"`
+	AnsiblePassword         string   `yaml:"ansible_password,omitempty"`
+	AnsibleBecomePassword   string   `yaml:"ansible_become_password,omitempty"`
+	AnsibleBecome           bool     `yaml:"ansible_become,omitempty"`
+	AnsibleSSHkey           string   `yaml:"ansible_sshkey,omitempty"`
 }
 
 type HostInstance struct {
@@ -69,23 +76,21 @@ type HostInstance struct {
 	Host   Host
 }
 type Host struct {
-	Hostname     string `json:"hostname"`
-	Ip           string `json:"ip"`
-	Port         int    `json:"-"`
-	IsLocal      bool   `json:"-"`
-	Username     string `json:"username"`
-	LoginType    string
-	SSHkey       string `json:"sshkey"`
-	Password     string `json:"password"`
-	IsMongo      string `json:"mongo"`
-	IsMaster     bool   `json:"master"`
-	IsNode       bool   `json:"node"`
-	IsOm         bool   `json:"om"`
-	IsSg         bool   `json:"sg"`
-	IsLogging    bool   `json:"is_logging"`
-	IsMonitoring bool
-	IsTracking   bool
-	Arch         string `json:"arch"`
+	Hostname   string `json:"hostname"`
+	Ip         string `json:"ip"`
+	Port       int    `json:"-"`
+	IsLocal    bool   `json:"-"`
+	Username   string `json:"username"`
+	LoginType  string
+	SSHkey     string `json:"sshkey"`
+	Password   string `json:"password"`
+	IsMongo    string `json:"mongo"`
+	IsMaster   bool   `json:"master"`
+	IsNode     bool   `json:"node"`
+	IsOm       bool   `json:"om"`
+	IsSg       bool   `json:"sg"`
+	IsTracking bool
+	Arch       string `json:"arch"`
 }
 
 func NewHostInstance(h Host) *HostInstance {
@@ -100,6 +105,7 @@ func NewInventory() *Inventory {
 	if err := yaml.Unmarshal(d, &t); err != nil {
 		log.Log.Fatal(err.Error())
 	}
+	log.Log.Debugln(t)
 	for k, v := range t.All.Hosts {
 		if k == "localhost" {
 			t.RemotePassword = v.RemoteMachinePassword
@@ -108,23 +114,28 @@ func NewInventory() *Inventory {
 			break
 		}
 	}
+	//兼容新版本10.26
+	if _, ok := t.All.Hosts["localhost"]; !ok {
+		t.RemotePassword = t.All.Variables.AnsiblePassword
+		t.RemoteUsername = t.All.Variables.AnsibleUser
+		t.RemoteSSHkey = t.All.Variables.AnsibleSSHkey
+	}
 	for k, v := range t.All.Hosts {
 		if k != "localhost" {
 			h := Host{Hostname: k,
-				Ip:           v.AnsibleHost,
-				Port:         v.AnsiblePort,
-				IsLocal:      false,
-				Username:     t.RemoteUsername,
-				Password:     t.RemotePassword,
-				SSHkey:       t.RemoteSSHkey,
-				IsMongo:      t.isMongo(k),
-				IsMaster:     t.isMaster(k),
-				IsNode:       t.isNode(k),
-				IsLogging:    t.isLoging(k),
-				IsMonitoring: t.isMonitoring(k),
-				IsTracking:   t.isTracking(k),
-				IsSg:         t.isSg(k),
-				Arch:         "connect err.",
+				Ip:         v.AnsibleHost,
+				Port:       v.AnsiblePort,
+				IsLocal:    false,
+				Username:   t.RemoteUsername,
+				Password:   t.RemotePassword,
+				SSHkey:     t.RemoteSSHkey,
+				IsMongo:    t.isMongo(k),
+				IsMaster:   t.isMaster(k),
+				IsNode:     t.isNode(k),
+				IsOm:       t.isOm(k),
+				IsTracking: t.isTracking(k),
+				IsSg:       t.isSg(k),
+				Arch:       "connect err.",
 			}
 			t.Hosts = append(t.Hosts, h)
 		}
@@ -171,22 +182,6 @@ func (i *Inventory) isOm(hostname string) bool {
 	return false
 }
 
-func (i *Inventory) isLoging(hostname string) bool {
-	if v, ok := i.All.Hosts[hostname]; ok {
-		if _, exist := v.NodeLabels["nodeType_logging"]; exist {
-			return true
-		}
-	}
-	return false
-}
-func (i *Inventory) isMonitoring(hostname string) bool {
-	if v, ok := i.All.Hosts[hostname]; ok {
-		if _, exist := v.NodeLabels["nodeType_monitoring"]; exist {
-			return true
-		}
-	}
-	return false
-}
 func (i *Inventory) isTracking(hostname string) bool {
 	if v, ok := i.All.Hosts[hostname]; ok {
 		if _, exist := v.NodeLabels["nodeType_tracking"]; exist {
