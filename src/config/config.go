@@ -25,7 +25,7 @@ var (
 		//Docker        bool
 		//Ansible       bool
 		Show bool
-
+		Yes bool
 		//Mongo     bool
 		//K8s       bool
 		UseDocker bool
@@ -65,6 +65,9 @@ func initGlobal() {
 	Kconfig.DownloadDir = "."
 	Kconfig.Template = ""
 	Kconfig.TemplateDir = "./"
+	Kconfig.Yes = viper.GetBool("yes")
+	Kconfig.Show = viper.GetBool("debug")
+
 	if viper.GetBool("debug") {
 		log.Log.SetLevel(logrus.DebugLevel)
 		log.Log.SetFormatter(&logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05", FullTimestamp: true})

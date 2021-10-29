@@ -69,10 +69,9 @@ func InstallK8s() {
 		//cmd = exec.Command("ansible-playbook", "-i", config.InventoryPath, "k8s-offline-install/kubespray/cluster-offline.yml", "-v", config.Kconfig.ExtraArgs)
 		log.Log.Info("Run CMD: ", cmd.String())
 		cmds = append(cmds, cmd)
-		if !src.CheckYes("Install " + os.Args[2] + " with local ansible 2.9.18 ") {
-			os.Exit(0)
+		if config.Kconfig.Yes || src.CheckYes("Install " + os.Args[2] + " with local ansible 2.9.18 ") {
+			runUseAnsible(cmds...)
 		}
-		runUseAnsible(cmds...)
 	} else {
 		var cmdStr string
 		cmdStr = "ansible-playbook -i inventory/hosts.yaml k8s-offline-install/kubespray/prepare.yml -v "

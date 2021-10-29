@@ -6,12 +6,13 @@ import (
 	"os/exec"
 
 	"github.com/deployKubernetesInCHINA/dkc-command/src"
+	"github.com/deployKubernetesInCHINA/dkc-command/src/config"
 	"github.com/deployKubernetesInCHINA/dkc-command/src/pkg/log"
 )
 
 func runUseAnsible(cmds ...*exec.Cmd) {
 
-	if src.CheckYes("Add k8s node use local ansible.") {
+	if config.Kconfig.Yes || src.CheckYes("Add k8s node use local ansible.") {
 		logfile, err := os.OpenFile("./node-add.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
 			log.Log.Fatal(err.Error())
