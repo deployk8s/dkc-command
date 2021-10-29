@@ -19,19 +19,21 @@ dkc项目旨帮助kubernetes小白在centos 7.9.2009上快速安装kubernetes v1
 
 #### 使用方式
 
-注: 第1-3步,可以在linux/windows/macos系统操作, 第4步安装过程和增删节点必须在服务器节点上执行.
 
 1. 在release页面下载dkc.tar.gz, 解压, 
 2. 下载k8s相关的离线文件,
 ```shell script
 ./dkc download cache
 ```
-3. 开启web界面,访问localhost:5555编辑拓扑文件,下载hosts.yaml,并放在inventory目录.或者访问[公网web地址](http://dkc.k8sfans.com:5555)
+3. 访问l[公网web地址](http://dkc.k8sfans.com:5555)编辑拓扑文件,下载hosts.yaml,并放在inventory目录
 
 ![](./images/page.png)
+
 ```shell script
-./dkc web
+#检查环境信息
+./dkc prepare show
 ```
+
 4. 安装kubernetes
 ```shell script
 ./dkc install k8s
