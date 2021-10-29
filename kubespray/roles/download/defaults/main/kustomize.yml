@@ -1,8 +1,0 @@
-kustomize_version: v4.2.0
-kustomize_download_url: "https://somewhere.com.cn/kustomize-{{kustomize_version}}.tgz"
-
-kustomize_checksums:
-  amd64:
-    v4.2.0: 220dd03dcda8e45dc50e4e42b2d71882cbc4c05e0ed863513e67930ecad939eb # 如果和文件的sha256sum值不一致的话，会重新下载文件
-
-kustomize_checksum: "{{kustomize_checksums[image_arch][kustomize_version] }}"

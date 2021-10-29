@@ -1,6 +1,0 @@
-- name: Beautiful Script | install kustomize
-  copy:
-    src: "{{ local_release_dir }}/kustomize"
-    dest: "{{ bin_dir }}/kustomize"
-    mode: 0755
-    remote_src: true

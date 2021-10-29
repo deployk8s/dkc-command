@@ -1,9 +1,0 @@
-- name: Beautiful Script | install kubensx
-  copy:
-    src: "{{ local_release_dir }}/kubensx-{{ kubensx_version }}-linux-{{ image_arch }}"
-    dest: "{{ bin_dir }}/kubensx"
-    mode: 0755
-    remote_src: true
-
-- name: Beautiful Script | bash-completion
-  include_tasks: bash-completion.yml
