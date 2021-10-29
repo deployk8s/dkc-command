@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/TwinProduction/go-color"
 
@@ -47,6 +48,10 @@ func UpdateMirror() error {
 func checkMirror() error {
 	var err error
 	_check := func(m string) error {
+		if !strings.HasPrefix(m, "http") && !strings.HasPrefix(m, "https") {
+			m = "http://" + m
+		}
+		log.Log.Debugln(m)
 		if mUrl, err := url.Parse(m); err != nil {
 			log.Log.Debug(err.Error())
 			return err
@@ -57,8 +62,10 @@ func checkMirror() error {
 			//mUrl.User = url.UserPassword(src.UserInfo["user"], src.UserInfo["password"])
 			mUrl.Path = mUrl.Path + "/repo.json"
 			config.Kconfig.Mirror = m
-
-			if res, err := http.Get(mUrl.String()); err != nil {
+			client := http.Client{
+				Timeout: 5 * time.Second,
+			}
+			if res, err := client.Get(mUrl.String()); err != nil {
 				log.Log.Error(err.Error())
 				return err
 			} else if res.StatusCode == 200 {
