@@ -15,7 +15,7 @@ func Show() {
 	inventory.CopyInventory()
 	i := inventory.NewInventory()
 	//t := src.NewTable("Hostname", "Master", "Node", "Mongo", "Log","Monitor","Track", "SG", "IP", "Release(尝试连接服务器)")
-	t := src.NewTable("Hostname", "Master", "Node", "Mongo", "Log", "Monitor", "SG", "IP", "Release(尝试连接服务器)")
+	t := src.NewTable("Hostname", "Master", "Node", "OM", "IP", "Release(尝试连接服务器)")
 	embarkData(t, i.Hosts)
 	t.Show()
 	//worker节点 80/443端口检测

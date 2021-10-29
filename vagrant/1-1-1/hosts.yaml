@@ -1,0 +1,86 @@
+all:
+  vars:
+    version: 3
+    login_type: password
+    external_domain_name: www.dkc.com
+    docker_daemon_graph: /var/lib/docker
+    nfs_type: internal
+    ansible_user: root
+    ansible_password: vagrant
+    ansible_become: false
+    ntp_servers:
+      - ntp.aliyun.com
+  hosts:
+    vagrant-master-1:
+      ansible_host: 192.168.56.10
+      ansible_port: 22
+      node_labels: {}
+    vagrant-worker-1:
+      ansible_host: 192.168.56.20
+      ansible_port: 22
+      node_labels:
+        node-role.kubernetes.io/worker: ''
+    vagrant-om-1:
+      ansible_host: 192.168.56.30
+      ansible_port: 22
+      node_labels:
+        nodeType_logging_data: 'true'
+        nodeType_logging_master: 'true'
+        nodeType_monitoring: 'true'
+        node-role.kubernetes.io/om: ''
+      node_taints:
+        - 'om.dkc=true:NoExecute'
+  children:
+    k8s_cluster:
+      vars:
+        minio_enabled: true
+        minio_storage_per_server: 10
+        registry_disk_size: 30Gi
+        prometheus_stack_enabled: true
+        grafana_storage_Gi: 10
+        alertmanager_storage_Gi: 10
+        prometheus_storage_Gi: 30
+        elk_enabled: true
+        elastic_storage_Gi: 50
+        logstash_storage_Gi: 10
+        local_path_provisioner_claim_root: /data
+        kube_service_addresses: 10.233.0.0/18
+        kube_pods_subnet: 10.233.64.0/18
+        csi_driver_nfs_enabled: true
+        csi_driver_nfs_server: 192.168.56.20
+        csi_driver_nfs_path: /
+        prometheus_storage_class_name: nfs-csi
+        minio_storage_class_name: local-path
+        elastic_master_storage_class_name: nfs-csi
+        registry_enabled: true
+        registry_storage_class: nfs-csi
+        registry_nodeSelector: {}
+        prometheus_stack_nodeselector:
+          nodeType_monitoring: 'true'
+        minio_nodeSelector: {}
+        logging_data_count: 1
+        logging_master_count: 1
+        minio_servers_count: 1
+      children:
+        kube_control_plane: {}
+        kube_node: {}
+    kube_control_plane:
+      vars: {}
+      hosts:
+        vagrant-master-1: {}
+    etcd:
+      children:
+        kube_control_plane: {}
+    kube_node:
+      children:
+        om: {}
+      hosts:
+        vagrant-worker-1: {}
+    om:
+      vars: {}
+      hosts:
+        vagrant-om-1: {}
+    nfs:
+      vars: {}
+      hosts:
+        vagrant-worker-1: {}
