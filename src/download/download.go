@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"github.com/pbnjay/memory"
 
 	"github.com/TwinProduction/go-color"
 
@@ -90,6 +91,16 @@ func checksum(name string) bool {
 			return false
 		}
 		return true
+	} else {
+		//如果repo中有md5记录,并且文件大小超出可用内存,也不进行比较
+		if st, err := os.Stat(localPath); err == nil {
+			if uint64(st.Size())+500*1024*1024 > memory.TotalMemory() {
+				log.Log.Warn(fmt.Sprintf("文件%s大小%dM 超过可用内存,无法进行md5校验,无法判断是否最新版本. 如果不是最新下载的,请手动将此文件删除,然后重新下载.", name, st.Size()/1024/1024))
+				return true
+			} else {
+				log.Log.Debug("文件大小未超过可用内存,进行md5校验")
+			}
+		}
 	}
 	if d, err := os.ReadFile(localPath); err != nil {
 		log.Log.Debugln(err.Error())

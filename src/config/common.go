@@ -6,6 +6,7 @@ var TarFiles = []string{
 	"ansible.tar",
 	"centos7_9_2009.tar",
 	"centos8_3_2011.tar",
+	"kubespray.tar",
 	"kubespray_cache.tar.gz",
 }
 
